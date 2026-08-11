@@ -49,6 +49,18 @@ view: bookability_contestant_attempts {
     description: "FK to ota.bookings.id. Set when the attempt finalized into a booking; NULL otherwise."
   }
 
+  dimension: booking_link {
+    type: string
+    sql: CASE
+           WHEN ${booking_id} IS NOT NULL
+           THEN CONCAT('https://reservations.voyagesalacarte.ca/booking/index/', ${booking_id})
+         END ;;
+    group_label: "2. ATTEMPT INFO"
+    label: "Booking in Respro"
+    description: "Deep link to the booking detail page in Respro (reservations.voyagesalacarte.ca/booking/index/<booking_id>). Null when the attempt has no finalized booking."
+    html: {% if value %}<a href="{{ value }}" target="_blank">Open booking</a>{% endif %} ;;
+  }
+
   dimension: gds {
     type: string
     sql: ${TABLE}.gds ;;
