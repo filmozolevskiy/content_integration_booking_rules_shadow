@@ -21,10 +21,11 @@ explore: bookability_contestant_attempts {
   }
 
   # Bound the 24M-row base table. Defaults reproduce the source query
-  # (last 1 day, successful attempts); the analyst can widen them.
+  # (successful attempts) over a rolling 30-day window; the analyst can
+  # widen or narrow them.
   always_filter: {
     filters: [
-      bookability_contestant_attempts.date_created_date: "1 days",
+      bookability_contestant_attempts.date_created_date: "30 days",
       bookability_contestant_attempts.status: "1"
     ]
   }
