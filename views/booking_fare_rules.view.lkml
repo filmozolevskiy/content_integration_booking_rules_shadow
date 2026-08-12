@@ -70,15 +70,21 @@ view: booking_fare_rules {
     type: string
     hidden: yes
     label: "Fare Rule (full)"
-    description: "Full fare-rule text, reformatted for readability (divider runs become paragraph breaks). Surfaced only inside the drill overlay of Fare Rule Text."
+    description: "Full fare-rule text, reformatted for the drill overlay: HTML-escaped, divider runs and newlines converted to <br> so line breaks survive the overlay's whitespace collapsing."
     sql: REGEXP_REPLACE(
-           REGEXP_REPLACE(
-             CONVERT(${TABLE}.rule USING utf8mb4),
-             _utf8mb4'[ ]*-{3,}[ ]*', _utf8mb4'\n\n'
+           REPLACE(
+             REPLACE(
+               REGEXP_REPLACE(
+                 REPLACE(REPLACE(REPLACE(CONVERT(${TABLE}.rule USING utf8mb4), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'),
+                 _utf8mb4'[ ]*-{3,}[ ]*', _utf8mb4'\n\n'
+               ),
+               '\r', ''
+             ),
+             '\n', '<br>'
            ),
-           _utf8mb4'[\r\n]{3,}', _utf8mb4'\n\n'
+           _utf8mb4'(<br>){3,}', _utf8mb4'<br><br>'
          ) ;;
-    html: <div style="white-space: pre-wrap; font-family: monospace; line-height: 1.5; max-width: 680px;">{{ value }}</div> ;;
+    html: <div style="font-family: monospace; line-height: 1.5; max-width: 680px;">{{ value }}</div> ;;
   }
 
   measure: fare_rule_count {
