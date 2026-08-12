@@ -61,7 +61,18 @@ view: booking_fare_rules {
     sql: ${TABLE}.rule ;;
     group_label: "10. FARE RULES"
     label: "Fare Rule Text"
-    description: "Raw stored fare-rule text (penalty / cancellation / change paragraphs). Display field."
+    description: "Fare-rule text. Click the cell to open the full rule in a drill overlay."
+    drill_fields: [booking_fare_rules.booking_id, booking_fare_rules.airline_code, booking_fare_rules.rule_full]
+    html: <a href="#drillmenu" target="_self">{{ value | truncate: 80 }}</a> ;;
+  }
+
+  dimension: rule_full {
+    type: string
+    sql: ${TABLE}.rule ;;
+    hidden: yes
+    label: "Fare Rule (full)"
+    description: "Full fare-rule text, pre-wrapped. Surfaced only inside the drill overlay of Fare Rule Text."
+    html: <div style="white-space: pre-wrap; font-family: monospace; line-height: 1.4; max-width: 640px;">{{ value }}</div> ;;
   }
 
   measure: fare_rule_count {
