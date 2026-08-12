@@ -70,13 +70,13 @@ view: booking_fare_rules {
     type: string
     hidden: yes
     label: "Fare Rule (full)"
-    description: "Full fare-rule text, reformatted for the drill overlay: HTML-escaped, divider runs and newlines converted to <br> so line breaks survive the overlay's whitespace collapsing."
+    description: "Full fare-rule text, reformatted for the drill overlay: HTML-escaped, divider runs (ASCII + Unicode dashes) and newlines converted to <br> so line breaks survive the overlay's whitespace collapsing."
     sql: REGEXP_REPLACE(
            REPLACE(
              REPLACE(
                REGEXP_REPLACE(
                  REPLACE(REPLACE(REPLACE(CONVERT(${TABLE}.rule USING utf8mb4), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'),
-                 _utf8mb4'[ ]*-{3,}[ ]*', _utf8mb4'\n\n'
+                 _utf8mb4'[ ]*[-‐‑‒–—―−_=]{3,}[ ]*', _utf8mb4'\n\n'
                ),
                '\r', ''
              ),
