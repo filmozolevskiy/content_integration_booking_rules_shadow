@@ -40,6 +40,16 @@ explore: bookability_contestant_attempts {
     sql_on: ${booking_rules_shadow.id} = ${rules_comparison_dimension.shadow_id} ;;
   }
 
+  join: booking_fare_rules {
+    type: left_outer
+    relationship: one_to_many
+    # Why (2026-08-12, FM): booking_id is NOT unique in booking_fare_rules
+    # (~1.65 rows per booking; 43.1M rows / 26.1M bookings), so one booking
+    # fans out to many rule rows. Only the rule text is surfaced; the
+    # count_distinct measure on id keeps counts correct.
+    sql_on: ${bookability_contestant_attempts.booking_id} = ${booking_fare_rules.booking_id} ;;
+  }
+
   # Bound the 24M-row base table. Defaults reproduce the source query
   # (successful attempts) over a rolling 30-day window; the analyst can
   # widen or narrow them.
