@@ -20,6 +20,16 @@ explore: bookability_contestant_attempts {
         AND ${booking_rules_shadow.package_id} = ${bookability_contestant_attempts.package_hash} ;;
   }
 
+  join: booking_details {
+    type: left_outer
+    relationship: many_to_one
+    # Why (2026-08-12, FM): booking_details.booking_id is UNIQUE (one row
+    # per booking; verified via information_schema COLUMN_KEY = UNI), so
+    # each attempt maps to 0/1 detail row and this join adds no fan-out.
+    # Existing booking_rules_shadow counts are unaffected.
+    sql_on: ${bookability_contestant_attempts.booking_id} = ${booking_details.booking_id} ;;
+  }
+
   # Bound the 24M-row base table. Defaults reproduce the source query
   # (successful attempts) over a rolling 30-day window; the analyst can
   # widen or narrow them.
