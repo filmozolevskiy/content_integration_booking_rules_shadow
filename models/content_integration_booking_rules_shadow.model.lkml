@@ -30,6 +30,16 @@ explore: bookability_contestant_attempts {
     sql_on: ${bookability_contestant_attempts.booking_id} = ${booking_details.booking_id} ;;
   }
 
+  join: rules_comparison_dimension {
+    type: left_outer
+    relationship: one_to_many
+    # Why (2026-08-12, FM): one shadow row unnests into up to 8 dimension
+    # rows (4 rule dimensions x 2 pax groups). Measures are count_distinct
+    # on the element PK / shadow_id, so counts stay correct under the
+    # fan-out and existing shadow / attempt measures are unaffected.
+    sql_on: ${booking_rules_shadow.id} = ${rules_comparison_dimension.shadow_id} ;;
+  }
+
   # Bound the 24M-row base table. Defaults reproduce the source query
   # (successful attempts) over a rolling 30-day window; the analyst can
   # widen or narrow them.
