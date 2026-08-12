@@ -68,11 +68,17 @@ view: booking_fare_rules {
 
   dimension: rule_full {
     type: string
-    sql: ${TABLE}.rule ;;
     hidden: yes
     label: "Fare Rule (full)"
-    description: "Full fare-rule text, pre-wrapped. Surfaced only inside the drill overlay of Fare Rule Text."
-    html: <div style="white-space: pre-wrap; font-family: monospace; line-height: 1.4; max-width: 640px;">{{ value }}</div> ;;
+    description: "Full fare-rule text, reformatted for readability (divider runs become paragraph breaks). Surfaced only inside the drill overlay of Fare Rule Text."
+    sql: REGEXP_REPLACE(
+           REGEXP_REPLACE(
+             CONVERT(${TABLE}.rule USING utf8mb4),
+             _utf8mb4'[ ]*-{3,}[ ]*', _utf8mb4'\n\n'
+           ),
+           _utf8mb4'[\r\n]{3,}', _utf8mb4'\n\n'
+         ) ;;
+    html: <div style="white-space: pre-wrap; font-family: monospace; line-height: 1.5; max-width: 680px;">{{ value }}</div> ;;
   }
 
   measure: fare_rule_count {
