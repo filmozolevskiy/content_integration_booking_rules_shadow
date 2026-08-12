@@ -58,33 +58,23 @@ view: booking_fare_rules {
 
   dimension: rule {
     type: string
-    sql: ${TABLE}.rule ;;
-    group_label: "10. FARE RULES"
-    label: "Fare Rule Text"
-    description: "Fare-rule text. Click the cell to open the full rule in a drill overlay."
-    drill_fields: [booking_fare_rules.booking_id, booking_fare_rules.airline_code, booking_fare_rules.rule_full]
-    html: <a href="#drillmenu" target="_self">{{ value | truncate: 80 }}</a> ;;
-  }
-
-  dimension: rule_full {
-    type: string
-    hidden: yes
-    label: "Fare Rule (full)"
-    description: "Full fare-rule text, reformatted for the drill overlay: HTML-escaped, divider runs (ASCII + Unicode dashes) and newlines converted to <br> so line breaks survive the overlay's whitespace collapsing."
     sql: REGEXP_REPLACE(
            REPLACE(
              REPLACE(
                REGEXP_REPLACE(
-                 REPLACE(REPLACE(REPLACE(CONVERT(${TABLE}.rule USING utf8mb4), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'),
-                 _utf8mb4'[ ]*[-‐‑‒–—―−_=]{3,}[ ]*', _utf8mb4'\n\n'
+                 REPLACE(REPLACE(REPLACE(REPLACE(CONVERT(${TABLE}.rule USING utf8mb4), '&', '&amp;'), '<', '&lt;'), '>', '&gt;'), '"', '&quot;'),
+                 _utf8mb4'[ ]*[-‐‑‒–—―−_=]{3,}[ ]*', _utf8mb4'&#10;&#10;'
                ),
                '\r', ''
              ),
-             '\n', '<br>'
+             '\n', '&#10;'
            ),
-           _utf8mb4'(<br>){3,}', _utf8mb4'<br><br>'
+           _utf8mb4'(&#10;){3,}', _utf8mb4'&#10;&#10;'
          ) ;;
-    html: <div style="font-family: monospace; line-height: 1.5; max-width: 680px;">{{ value }}</div> ;;
+    group_label: "10. FARE RULES"
+    label: "Fare Rule Text"
+    description: "Fare-rule text. Hover the cell to read the full rule (formatted) in a tooltip; the cell shows a short preview."
+    html: <span title="{{ value }}" style="cursor: help; border-bottom: 1px dotted #888;">{{ value | replace: '&#10;', ' ' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&lt;', '<' | replace: '&gt;', '>' | truncate: 90 }}</span> ;;
   }
 
   measure: fare_rule_count {
